@@ -1,45 +1,50 @@
 package pro1.swingComponents;
 
-import pro1.drawingModel.*;
-import pro1.drawingModel.Rectangle;
-import pro1.utils.ColorUtils;
-
+import pro1.drawingModel.Cross;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MainFrame extends JFrame {
-    DisplayPanel displayPanel;
+    private final DisplayPanel displayPanel;
+    private final OptionsPanel optionsPanel;
 
     public MainFrame() {
-        this.setTitle("PRO1 Drawing");
-        this.setVisible(true);
-        this.setSize(800, 800);
+        this.setTitle("PRO1 Drawing - i2500446");
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setLayout(new BorderLayout());
 
-        this.displayPanel = new DisplayPanel();
+        this.optionsPanel = new OptionsPanel(this);
+        this.displayPanel = new DisplayPanel(optionsPanel);
+
+        this.add(this.optionsPanel, BorderLayout.WEST);
         this.add(this.displayPanel, BorderLayout.CENTER);
-
-        JPanel leftPanel = new JPanel();
-        leftPanel.setPreferredSize(
-                new Dimension(200, 0));
-        this.add(leftPanel, BorderLayout.WEST);
 
         this.displayPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                displayPanel.setDrawable(example(e.getX(), e.getY()));
+                createCrossAt(e.getX(), e.getY());
             }
         });
+        this.setVisible(true);
     }
 
-    private Drawable example(int x, int y) {
-        var color = ColorUtils.randomColor();
-        var d1 = new Ellipse(0, 0, 150, 250, color);
-        var d2 = new Text(0, 0, color);
-        var d3 = new Line(0, 50,170,170,3, color);
-        return new Group(new Drawable[]{d1, d2, d3}, x, y, 40, 1, 1);
+    private void createCrossAt(int x, int y) {
+        Color color;
+        if (optionsPanel.isColorEnabled()) {
+            float ratio = (float) (x + y) / (displayPanel.getWidth() + displayPanel.getHeight());
+            int r = Math.max(0, Math.min(255, (int)(255 * (1 - ratio))));
+            int g = Math.max(0, Math.min(255, (int)(255 * ratio)));
+            color = new Color(r, g, 0);
+        } else {
+            color = Color.GRAY;
+        }
+        displayPanel.addCross(new Cross(x, y, color));
+    }
+
+    public void resetDrawing() {
+        displayPanel.clear();
     }
 }
