@@ -1,1 +1,2 @@
-This is my readme file.
+Ksenia Shevchenko
+i2500446
